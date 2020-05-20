@@ -119,6 +119,26 @@ class CPU:
                 result = self.reg[operand_a] * self.reg[operand_b]
                 print(result)
                 self.pc += 3
+            # elif instruction == PUSH:
+            #     # Get register number
+            #     # Get value out of the register
+            #     val = self.reg[operand_a]
+            #     # Decrement the SP
+            #     self.reg[self.sp] -= 1
+            #     # Store value in memory at SP
+            #     top_of_stack_addr = self.reg[self.sp]
+            #     self.ram[top_of_stack_addr] = val
+            #     self.pc += 2
+            # elif instruction == POP:
+            #     # Get register number
+            #     # Get value out of the register
+            #     val = self.reg[operand_a]
+            #     # Store value in memory at SP
+            #     top_of_stack_addr = self.reg[self.sp]
+            #     self.ram[top_of_stack_addr] = val
+            #     # Increment the SP
+            #     self.reg[self.sp] += 1
+            #     self.pc += 2
             elif instruction == PUSH:
                 # Get register number
                 # Get value out of the register
@@ -126,17 +146,14 @@ class CPU:
                 # Decrement the SP
                 self.reg[self.sp] -= 1
                 # Store value in memory at SP
-                top_of_stack_addr = self.reg[self.sp]
-                self.ram[top_of_stack_addr] = val
+                self.ram[self.reg[self.sp]] = val
                 self.pc += 2
             elif instruction == POP:
                 # Get register number
                 # Get value out of the register
-                val = self.reg[operand_a]
+                val = self.ram[self.reg[self.sp]]
                 # Store value in memory at SP
-                top_of_stack_addr = self.reg[self.sp]
-                self.ram[top_of_stack_addr] = val
-                # Increment the SP
+                self.reg[operand_a] = val
                 self.reg[self.sp] += 1
                 self.pc += 2
             elif instruction == HLT:
