@@ -11,6 +11,7 @@ class CPU:
         self.pc = 0
         self.ram = [0] * 256
         self.reg = [0] * 8
+        self.sp = 7
 
     def ram_read(self, address):
         return self.ram[address]
@@ -94,6 +95,8 @@ class CPU:
         PRN = 0b01000111
         HLT = 0b00000001
         MUL = 0b10100010
+        PUSH = 0b01000101
+        POP = 0b01000110
 
         halted = False
 
@@ -116,6 +119,26 @@ class CPU:
                 result = self.reg[operand_a] * self.reg[operand_b]
                 print(result)
                 self.pc += 3
+            elif instruction == PUSH:
+                # Get register number
+                # Get value out of the register
+                val = self.reg[operand_a]
+                # Decrement the SP
+                self.reg[self.sp] -= 1
+                # Store value in memory at SP
+                top_of_stack_addr = self.reg[self.sp]
+                self.ram[top_of_stack_addr] = val
+                self.pc += 2
+            elif instruction == POP:
+                # Get register number
+                # Get value out of the register
+                val = self.reg[operand_a]
+                # Store value in memory at SP
+                top_of_stack_addr = self.reg[self.sp]
+                self.ram[top_of_stack_addr] = val
+                # Increment the SP
+                self.reg[self.sp] += 1
+                self.pc += 2
             elif instruction == HLT:
                 # Halt the CPU (and exit the emulator).
                 halted = True
