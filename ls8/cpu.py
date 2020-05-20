@@ -24,31 +24,40 @@ class CPU:
         address = 0
 
         # For now, we've just hardcoded a program:
-        LDI = 0b10000010
-        PRN = 0b01000111
-        HLT = 0b00000001
-        MUL = 0b10100010
+        # LDI = 0b10000010
+        # PRN = 0b01000111
+        # HLT = 0b00000001
+        # MUL = 0b10100010
 
-        program = [
-            # From print8.ls8
-            # From print8.ls8
-            LDI,  # LDI R0,8
-            0b00000000,
-            0b00001000,
-            LDI,  # LDI R1,9
-            0b00000001,
-            0b00001001,
-            MUL,  # MUL R0,R1
-            0b00000000,
-            0b00000001,
-            PRN,  # PRN R0
-            0b00000000,
-            HLT,  # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     # From print8.ls8
+        #     LDI,  # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     LDI,  # LDI R1,9
+        #     0b00000001,
+        #     0b00001001,
+        #     MUL,  # MUL R0,R1
+        #     0b00000000,
+        #     0b00000001,
+        #     PRN,  # PRN R0
+        #     0b00000000,
+        #     HLT,  # HLT
+        # ]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
+        with open(sys.argv[1]) as f:
+            for line in f:
+                string_val = line.split("#")[0].strip()
+                if string_val == '':
+                    continue
+                v = int(string_val, 2)
+                # print(v)
+                self.ram[address] = v
+                address += 1
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -113,4 +122,4 @@ class CPU:
             else:
                 print(
                     f'Unknown instruction {instruction} at address {self.pc}.')
-                sys.exit(1)
+                sys.exit()
