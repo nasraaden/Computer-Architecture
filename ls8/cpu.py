@@ -12,6 +12,7 @@ class CPU:
         self.ram = [0] * 256
         self.reg = [0] * 8
         self.sp = 7
+        self.fl = 0b00000000
 
     def ram_read(self, address):
         return self.ram[address]
@@ -24,32 +25,6 @@ class CPU:
 
         address = 0
 
-        # For now, we've just hardcoded a program:
-        # LDI = 0b10000010
-        # PRN = 0b01000111
-        # HLT = 0b00000001
-        # MUL = 0b10100010
-
-        # program = [
-        #     # From print8.ls8
-        #     # From print8.ls8
-        #     LDI,  # LDI R0,8
-        #     0b00000000,
-        #     0b00001000,
-        #     LDI,  # LDI R1,9
-        #     0b00000001,
-        #     0b00001001,
-        #     MUL,  # MUL R0,R1
-        #     0b00000000,
-        #     0b00000001,
-        #     PRN,  # PRN R0
-        #     0b00000000,
-        #     HLT,  # HLT
-        # ]
-
-        # for instruction in program:
-        #     self.ram[address] = instruction
-        #     address += 1
         with open(sys.argv[1]) as f:
             for line in f:
                 string_val = line.split("#")[0].strip()
@@ -100,6 +75,10 @@ class CPU:
         POP = 0b01000110
         CALL = 0b01010000
         RET = 0b00010001
+        CMP = 0b10100111
+        JMP = 0b01010100
+        JEQ = 0b01010101
+        JNE = 0b01010110
 
         halted = False
 
@@ -159,6 +138,24 @@ class CPU:
                 self.reg[self.sp] += 1
                 # Store it in the PC
                 self.pc = return_addr
+            elif instruction == CMP:
+                if self.reg[operand_a] == self.reg[operand_b]:
+                    self.fl = 1
+                else:
+                    self.fl = 0
+                self.pc += 3
+            elif instruction == JMP:
+                self.pc = self.reg[operand_a]
+            elif instruction == JEQ:
+                if self.fl == 1:
+                    self.pc = self.reg[operand_a]
+                else:
+                    self.pc += 2
+            elif instruction == JNE:
+                if self.fl == 0:
+                    self.pc = self.reg[operand_a]
+                else:
+                    self.pc += 2
             elif instruction == HLT:
                 # Halt the CPU (and exit the emulator).
                 halted = True
