@@ -94,9 +94,12 @@ class CPU:
         LDI = 0b10000010
         PRN = 0b01000111
         HLT = 0b00000001
+        ADD = 0b10100000
         MUL = 0b10100010
         PUSH = 0b01000101
         POP = 0b01000110
+        CALL = 0b01010000
+        RET = 0b00010001
 
         halted = False
 
@@ -114,31 +117,14 @@ class CPU:
                 # Print to the console the decimal integer value that is stored in the given register.
                 print(self.reg[operand_a])
                 self.pc += 2
+            elif instruction == ADD:
+                self.reg[operand_a] += self.reg[operand_b]
+                self.pc += 3
             elif instruction == MUL:
                 # Multiply the values in two registers together and store the result in registerA.
                 result = self.reg[operand_a] * self.reg[operand_b]
                 print(result)
                 self.pc += 3
-            # elif instruction == PUSH:
-            #     # Get register number
-            #     # Get value out of the register
-            #     val = self.reg[operand_a]
-            #     # Decrement the SP
-            #     self.reg[self.sp] -= 1
-            #     # Store value in memory at SP
-            #     top_of_stack_addr = self.reg[self.sp]
-            #     self.ram[top_of_stack_addr] = val
-            #     self.pc += 2
-            # elif instruction == POP:
-            #     # Get register number
-            #     # Get value out of the register
-            #     val = self.reg[operand_a]
-            #     # Store value in memory at SP
-            #     top_of_stack_addr = self.reg[self.sp]
-            #     self.ram[top_of_stack_addr] = val
-            #     # Increment the SP
-            #     self.reg[self.sp] += 1
-            #     self.pc += 2
             elif instruction == PUSH:
                 # Get register number
                 # Get value out of the register
@@ -154,8 +140,25 @@ class CPU:
                 val = self.ram[self.reg[self.sp]]
                 # Store value in memory at SP
                 self.reg[operand_a] = val
+                # Increment the SP
                 self.reg[self.sp] += 1
                 self.pc += 2
+            elif instruction == CALL:
+                return_addr = self.pc + 2
+                # Push it on the stack
+                self.reg[self.sp] -= 1
+                top_of_stack_addr = self.reg[self.sp]
+                self.ram[top_of_stack_addr] = return_addr
+                # Set the PC to the subroutine addr
+                subroutine_addr = self.reg[operand_a]
+                self.pc = subroutine_addr
+            elif instruction == RET:
+                # Pop the return addr off stack
+                top_of_stack_addr = self.reg[self.sp]
+                return_addr = self.ram[top_of_stack_addr]
+                self.reg[self.sp] += 1
+                # Store it in the PC
+                self.pc = return_addr
             elif instruction == HLT:
                 # Halt the CPU (and exit the emulator).
                 halted = True
